@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Métodos de interpolación en Python | Newton, Lagrange y splines</title>
+    <meta
+      name="description"
+      content="Aprende métodos de interpolación en Python: Newton, Lagrange, interpolación baricéntrica, splines cúbicos, diferencias divididas, nodos de Chebyshev, gráficas y código fuente."
+    >
+    <meta
+      name="keywords"
+      content="interpolación de Newton Python, interpolación de Lagrange Python, interpolación baricéntrica Python, splines cúbicos Python, diferencias divididas Python, interpolación polinómica Python, nodos de Chebyshev Python, fenómeno de Runge, métodos numéricos Python"
+    >
+    <meta name="author" content="Jon Ramos">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link
+      rel="canonical"
+      href="https://jonramos.dev/newton-lagrange-interpolation-python/index-es.html"
+    >
+    <link
+      rel="alternate"
+      hreflang="en"
+      href="https://jonramos.dev/newton-lagrange-interpolation-python/index.html"
+    >
+    <link
+      rel="alternate"
+      hreflang="es"
+      href="https://jonramos.dev/newton-lagrange-interpolation-python/index-es.html"
+    >
+    <link
+      rel="alternate"
+      hreflang="x-default"
+      href="https://jonramos.dev/newton-lagrange-interpolation-python/index.html"
+    >
+    <meta property="og:type" content="website">
+    <meta
+      property="og:title"
+      content="Métodos de interpolación en Python"
+    >
+    <meta
+      property="og:description"
+      content="Guía práctica de Newton, Lagrange, interpolación baricéntrica, splines cúbicos, código Python, gráficas y una demo interactiva."
+    >
+    <meta name="twitter:card" content="summary_large_image">
+    <meta
+      name="twitter:title"
+      content="Métodos de interpolación en Python"
+    >
+    <meta
+      name="twitter:description"
+      content="Aprende interpolación polinómica con Newton, Lagrange, baricéntrico, splines cúbicos y ejemplos interactivos."
+    >
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareSourceCode",
+        "name": "Métodos de interpolación en Python",
+        "description": "Guía y código Python para interpolación de Newton, interpolación de Lagrange, interpolación baricéntrica, splines cúbicos, diferencias divididas, nodos de Chebyshev y fenómeno de Runge.",
+        "programmingLanguage": "Python",
+        "inLanguage": "es",
+        "learningResourceType": "Tutorial",
+        "keywords": [
+          "interpolación de Newton Python",
+          "interpolación de Lagrange Python",
+          "interpolación baricéntrica Python",
+          "splines cúbicos Python",
+          "diferencias divididas Python",
+          "interpolación polinómica",
+          "nodos de Chebyshev",
+          "fenómeno de Runge"
+        ],
+        "codeRepository": "https://github.com/jramosg/newton-interpolation-method-python"
+      }
+    </script>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header>
+      <nav aria-label="Navegación principal">
+        <strong>Métodos de interpolación en Python</strong>
+        <div>
+          <a href="#methods">Métodos</a>
+          <a href="#nodes">Nodos</a>
+          <a href="#demo">Demo interactiva</a>
+          <a href="#support">Apoyar</a>
+          <a href="index.html" lang="en">English</a>
+          <a href="polynomial_interpolation.py">Código fuente</a>
+        </div>
+      </nav>
+    </header>
+
+    <div class="hero">
+      <div class="hero-inner">
+        <div>
+          <p class="eyebrow">Tutorial de métodos numéricos</p>
+          <h1>Métodos de interpolación en Python</h1>
+          <p class="lead">
+            Guía práctica de Newton, Lagrange, interpolación
+            baricéntrica, splines cúbicos, diferencias divididas, nodos de
+            Chebyshev, fenómeno de Runge, gráficas, errores y código Python
+            reutilizable.
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="#demo">Probar la demo</a>
+            <a class="button coffee-link" href="#support">
+              Apoyar esta guía
+            </a>
+            <a class="button" href="polynomial_interpolation.py">
+              Ver archivo Python
+            </a>
+            <a
+              class="button"
+              href="https://github.com/jramosg/newton-interpolation-method-python"
+            >
+              Repositorio GitHub
+            </a>
+          </div>
+        </div>
+        <figure class="hero-visual" aria-label="Vista previa de interpolación">
+          <div class="visual-toolbar">
+            <strong>Función de Runge, 11 nodos</strong>
+            <div class="legend">
+              <span><i class="dot" style="background:#17202a"></i>Real</span>
+              <span><i class="dot" style="background:#1e5eff"></i>Newton</span>
+              <span><i class="dot" style="background:#c0392b"></i>Nodos</span>
+            </div>
+          </div>
+          <canvas id="heroChart" width="720" height="420"></canvas>
+        </figure>
+      </div>
+    </div>
+
+    <main>
+      <section class="support-strip" aria-label="Apoyar esta guía gratuita">
+        <div>
+          <strong>Guía gratuita de interpolación.</strong>
+          Si esta guía te ahorra tiempo, puedes apoyar más tutoriales, ejemplos
+          y código abierto.
+        </div>
+        <div class="coffee-button">
+          <a class="coffee-cta" href="https://www.buymeacoffee.com/jramosg">
+            Invítame un café
+          </a>
+        </div>
+      </section>
+
+      <section id="methods" aria-labelledby="objetivo">
+        <h2 id="objetivo">Qué aprenderás</h2>
+        <p class="section-lead">
+          Esta página está pensada para quienes buscan una explicación
+          clara de cómo interpolar puntos en Python usando Newton o Lagrange.
+        </p>
+        <div class="grid">
+          <article class="card">
+            <h3>Interpolación de Newton</h3>
+            <p>
+              Construye la tabla de diferencias divididas y evalúa el polinomio
+              de Newton mediante multiplicación anidada.
+            </p>
+            <strong>Idea clave: diferencias divididas</strong>
+          </article>
+          <article class="card">
+            <h3>Interpolación de Lagrange</h3>
+            <p>
+              Comprende la fórmula directa del polinomio interpolador y cómo
+              usar SciPy en ejemplos educativos.
+            </p>
+            <strong>Idea clave: bases polinómicas</strong>
+          </article>
+          <article class="card">
+            <h3>Nodos de Chebyshev</h3>
+            <p>
+              Compara nodos equiespaciados contra Chebyshev para entender por
+              qué aparece el fenómeno de Runge.
+            </p>
+            <strong>Idea clave: mejor colocación de nodos</strong>
+          </article>
+          <article class="card">
+            <h3>Interpolación baricéntrica</h3>
+            <p>
+              Compara un método de interpolación polinómica más estable para la
+              evaluación numérica.
+            </p>
+            <strong>Idea clave: evaluación polinómica estable</strong>
+          </article>
+          <article class="card">
+            <h3>Splines cúbicos</h3>
+            <p>
+              Observa por qué la interpolación por tramos evita muchas
+              oscilaciones de los polinomios globales de grado alto.
+            </p>
+            <strong>Idea clave: interpolación suave por tramos</strong>
+          </article>
+        </div>
+      </section>
+
+      <section id="nodes" aria-labelledby="nodes-title">
+        <h2 id="nodes-title">Nodos de Chebyshev vs nodos equiespaciados</h2>
+        <p class="section-lead">
+          La posición de los nodos puede importar tanto como la fórmula de
+          interpolación. Con polinomios globales de grado alto, los nodos
+          equiespaciados pueden crear oscilaciones grandes cerca de los extremos
+          del intervalo. Los nodos de Chebyshev se concentran cerca de los
+          extremos y suelen reducir ese comportamiento.
+        </p>
+        <div class="comparison-grid">
+          <article class="card">
+            <h3>Nodos equiespaciados</h3>
+            <p>
+              Son fáciles de entender y aparecen en muchos ejemplos iniciales,
+              pero pueden producir oscilaciones grandes en los extremos para
+              funciones como la función de Runge.
+            </p>
+            <pre><code>x_nodes = np.linspace(-1, 1, n)</code></pre>
+          </article>
+          <article class="card">
+            <h3>Nodos de Chebyshev</h3>
+            <p>
+              Están más concentrados cerca de los extremos del intervalo. En
+              interpolación polinómica global, suelen dar un perfil de error
+              mucho mejor que los nodos equiespaciados.
+            </p>
+            <pre><code>k = np.arange(1, n + 1)
+x_nodes = np.cos((2*k - 1) * np.pi / (2*n))</code></pre>
+          </article>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Tipo de nodo</th>
+              <th>Qué suele pasar</th>
+              <th>Pruébalo en la demo</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Equiespaciado</td>
+              <td>Separación simple, pero más vulnerable al fenómeno de Runge.</td>
+              <td>Usa la función de Runge con 11 o 21 nodos.</td>
+            </tr>
+            <tr>
+              <td>Chebyshev</td>
+              <td>Menor oscilación en los extremos en muchos ejemplos globales.</td>
+              <td>Cambia el tipo de nodo a Chebyshev y compara la curva.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="newton" aria-labelledby="newton-title">
+        <h2 id="newton-title">Interpolación de Newton en Python</h2>
+        <p class="section-lead">
+          El método de Newton escribe el polinomio usando coeficientes calculados
+          con una tabla de diferencias divididas. Es muy útil para aprender la
+          estructura del polinomio interpolador.
+        </p>
+        <div class="steps">
+          <article class="step">
+            <h3>Elegir los nodos de interpolación</h3>
+            <p>
+              Parte de puntos <code>(x0, y0), (x1, y1), ...</code>. Los valores
+              de <code>x</code> no deben repetirse.
+            </p>
+          </article>
+          <article class="step">
+            <h3>Construir la tabla de diferencias divididas</h3>
+            <p>
+              La primera columna contiene los valores <code>y</code>. Las
+              columnas siguientes calculan cocientes entre diferencias.
+            </p>
+          </article>
+          <article class="step">
+            <h3>Evaluar el polinomio</h3>
+            <p>
+              La forma anidada permite evaluar el polinomio de Newton de manera
+              compacta y eficiente.
+            </p>
+          </article>
+        </div>
+        <pre><code>import numpy as np
+from polynomial_interpolation import (
+    evaluate_newton_polynomial,
+    newton_coefficients,
+)
+
+x_nodes = np.array([-1.0, -0.5, 0.0, 0.5, 1.0])
+y_nodes = 1 / (1 + 25 * x_nodes**2)
+
+coefficients = newton_coefficients(x_nodes, y_nodes)
+value = evaluate_newton_polynomial(coefficients, x_nodes, 0.25)
+
+print(float(value))</code></pre>
+      </section>
+
+      <section id="lagrange" aria-labelledby="lagrange-title">
+        <h2 id="lagrange-title">Interpolación de Lagrange en Python</h2>
+        <p class="section-lead">
+          Con los mismos nodos, Lagrange y Newton representan el mismo polinomio
+          interpolador. Lagrange suele ser la fórmula más directa para entender
+          la teoría.
+        </p>
+        <pre><code>import numpy as np
+from scipy.interpolate import lagrange
+
+x_nodes = np.array([-1.0, -0.5, 0.0, 0.5, 1.0])
+y_nodes = 1 / (1 + 25 * x_nodes**2)
+
+polynomial = lagrange(x_nodes, y_nodes)
+print(polynomial(0.25))</code></pre>
+        <table>
+          <thead>
+            <tr>
+              <th>Método</th>
+              <th>Qué enseña</th>
+              <th>Nota práctica</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Newton</td>
+              <td>Diferencias divididas e interpolación incremental</td>
+              <td>Buen método para implementar desde cero.</td>
+            </tr>
+            <tr>
+              <td>Lagrange</td>
+              <td>Fórmula directa del polinomio interpolador</td>
+              <td>Muy claro matemáticamente, menos cómodo para actualizar.</td>
+            </tr>
+            <tr>
+              <td>Baricéntrico</td>
+              <td>Evaluación estable de polinomios interpoladores</td>
+              <td>Suele ser preferible en cálculo numérico real.</td>
+            </tr>
+            <tr>
+              <td>Spline cúbico</td>
+              <td>Interpolación suave por tramos</td>
+              <td>Evita muchos problemas de polinomios globales de grado alto.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="demo" aria-labelledby="demo-title">
+        <h2 id="demo-title">Demo interactiva de interpolación</h2>
+        <p class="section-lead">
+          Cambia la función, el tipo de nodos y el punto de evaluación. La
+          gráfica muestra cómo la elección de nodos afecta al error.
+        </p>
+        <div class="demo">
+          <aside class="controls" aria-label="Controles de interpolación">
+            <div class="field">
+              <label for="functionSelect">Función</label>
+              <select id="functionSelect">
+                <option value="runge">Runge: 1 / (1 + 25x²)</option>
+                <option value="sin">sin(x)</option>
+                <option value="gaussian">exp(-20x²)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="nodeSelect">Tipo de nodos</label>
+              <select id="nodeSelect">
+                <option value="equispaced">Nodos equiespaciados</option>
+                <option value="chebyshev">Nodos de Chebyshev</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="countInput">Número de nodos</label>
+              <input id="countInput" type="number" min="3" max="25" value="11">
+            </div>
+            <div class="field">
+              <label for="pointInput">Evaluar en x</label>
+              <input
+                id="pointInput"
+                type="number"
+                min="-1"
+                max="1"
+                step="0.05"
+                value="0.25"
+              >
+            </div>
+            <div class="result" id="demoResult">P(0.25) = ...</div>
+          </aside>
+          <figure class="wide-visual">
+            <div class="visual-toolbar">
+              <strong>Gráfica del polinomio interpolador</strong>
+              <div class="legend">
+                <span><i class="dot" style="background:#17202a"></i>Real</span>
+                <span><i class="dot" style="background:#1e5eff"></i>Newton</span>
+                <span><i class="dot" style="background:#c0392b"></i>Nodos</span>
+              </div>
+            </div>
+            <canvas id="demoChart" width="860" height="430"></canvas>
+          </figure>
+        </div>
+      </section>
+
+      <section aria-labelledby="uso-title">
+        <h2 id="uso-title">Cómo ejecutar el repositorio</h2>
+        <p class="section-lead">
+          El archivo principal reproduce el experimento completo: Newton,
+          Lagrange, método baricéntrico y spline cúbico.
+        </p>
+        <pre><code>python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python polynomial_interpolation.py</code></pre>
+      </section>
+
+      <section id="support" class="support-panel" aria-labelledby="support-title">
+        <div>
+          <p class="eyebrow">Apoya el proyecto</p>
+          <h2 id="support-title">Ayúdame a mantener esta guía gratis</h2>
+          <p class="section-lead">
+            Hice este recurso para quienes necesitan una referencia clara
+            con código, gráficas y ejemplos. Si te ayudó, un café me ayuda
+            a publicar más materiales de métodos numéricos.
+          </p>
+        </div>
+        <div class="coffee-button">
+          <a class="coffee-cta" href="https://www.buymeacoffee.com/jramosg">
+            Invítame un café
+          </a>
+          <p>
+            <a href="https://www.buymeacoffee.com/jramosg">
+              Abrir Buy Me a Coffee
+            </a>
+          </p>
+        </div>
+      </section>
+
+      <footer>
+        <p>
+          Código fuente:
+          <a href="polynomial_interpolation.py">polynomial_interpolation.py</a>.
+          Versión en inglés:
+          <a href="index.html" lang="en">English page</a>.
+        </p>
+      </footer>
+    </main>
+
+    <script src="app.js" defer></script>
+    <script
+      data-name="BMC-Widget"
+      data-cfasync="false"
+      src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js"
+      data-id="jramosg"
+      data-description="Support me on Buy Me a Coffee!"
+      data-message=""
+      data-color="#FFDD00"
+      data-position="Right"
+      data-x_margin="18"
+      data-y_margin="18"
+    ></script>
+  </body>
+</html>

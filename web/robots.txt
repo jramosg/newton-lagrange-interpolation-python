@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://jonramos.dev/newton-lagrange-interpolation-python/sitemap.xml
