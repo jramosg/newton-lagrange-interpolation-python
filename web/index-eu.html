@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="eu">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Interpolazio metodoak Python-en | Newton, Lagrange eta splineak</title>
+    <meta
+      name="description"
+      content="Ikasi interpolazio metodoak Python-en: Newton, Lagrange, interpolazio barizentrikoa, spline kubikoak, diferentzia banatuak, Chebyshev nodoak, grafikak eta iturburu kodea."
+    >
+    <meta
+      name="keywords"
+      content="Newton interpolazioa Python, Lagrange interpolazioa Python, interpolazio barizentrikoa Python, spline kubikoak Python, diferentzia banatuak Python, interpolazio polinomikoa Python, Chebyshev nodoak Python, Runge fenomenoa, metodo numerikoak Python, SciPy interpolazioa"
+    >
+    <meta name="author" content="Jon Ramos">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link
+      rel="canonical"
+      href="https://jonramos.dev/newton-lagrange-interpolation-python/index-eu.html"
+    >
+    <link
+      rel="alternate"
+      hreflang="en"
+      href="https://jonramos.dev/newton-lagrange-interpolation-python/index.html"
+    >
+    <link
+      rel="alternate"
+      hreflang="es"
+      href="https://jonramos.dev/newton-lagrange-interpolation-python/index-es.html"
+    >
+    <link
+      rel="alternate"
+      hreflang="eu"
+      href="https://jonramos.dev/newton-lagrange-interpolation-python/index-eu.html"
+    >
+    <link
+      rel="alternate"
+      hreflang="x-default"
+      href="https://jonramos.dev/newton-lagrange-interpolation-python/index.html"
+    >
+    <meta property="og:type" content="website">
+    <meta
+      property="og:title"
+      content="Interpolazio metodoak Python-en"
+    >
+    <meta
+      property="og:description"
+      content="Newton, Lagrange, interpolazio barizentriko, spline kubiko, Python kode eta demo interaktiboaren gida praktikoa."
+    >
+    <meta name="twitter:card" content="summary_large_image">
+    <meta
+      name="twitter:title"
+      content="Interpolazio metodoak Python-en"
+    >
+    <meta
+      name="twitter:description"
+      content="Ikasi interpolazio polinomikoa Newton, Lagrange, barizentriko, spline kubiko eta adibide interaktiboekin."
+    >
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareSourceCode",
+        "name": "Interpolazio metodoak Python-en",
+        "description": "Newton interpolazioa, Lagrange interpolazioa, interpolazio barizentrikoa, spline kubikoak, diferentzia banatuak, Chebyshev nodoak eta Runge fenomenoaren gida eta Python kodea.",
+        "programmingLanguage": "Python",
+        "inLanguage": "eu",
+        "learningResourceType": "Tutorial",
+        "keywords": [
+          "Newton interpolazioa Python",
+          "Lagrange interpolazioa Python",
+          "interpolazio barizentrikoa Python",
+          "spline kubikoak Python",
+          "diferentzia banatuak Python",
+          "interpolazio polinomikoa",
+          "Chebyshev nodoak",
+          "Runge fenomenoa"
+        ],
+        "codeRepository": "https://github.com/jramosg/newton-interpolation-method-python"
+      }
+    </script>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header>
+      <nav aria-label="Nabigazio nagusia">
+        <strong>Interpolazio metodoak Python-en</strong>
+        <div>
+          <a href="#methods">Metodoak</a>
+          <a href="#nodes">Nodoak</a>
+          <a href="#demo">Demo interaktiboa</a>
+          <a href="#support">Babestu</a>
+          <a href="index.html" lang="en">English</a>
+          <a href="index-es.html" lang="es">Español</a>
+          <a href="polynomial_interpolation.py">Iturburu kodea</a>
+        </div>
+      </nav>
+    </header>
+
+    <div class="hero">
+      <div class="hero-inner">
+        <div>
+          <p class="eyebrow">Metodo numerikoen tutoriala</p>
+          <h1>Interpolazio metodoak Python-en</h1>
+          <p class="lead">
+            Newton interpolazioaren, Lagrange interpolazioaren, interpolazio
+            barizentrikoaren, spline kubikoen, Chebyshev nodoen eta Runge
+            fenomenoaren, grafika, errore eta Python kode berrerabilgarriaren
+            gida praktikoa.
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="#demo">Probatu demoa</a>
+            <a class="button coffee-link" href="#support">
+              Babestu gida hau
+            </a>
+            <a class="button" href="polynomial_interpolation.py">
+              Ireki Python fitxategia
+            </a>
+            <a
+              class="button"
+              href="https://github.com/jramosg/newton-interpolation-method-python"
+            >
+              GitHub biltegia
+            </a>
+          </div>
+        </div>
+        <figure class="hero-visual" aria-label="Interpolazioaren aurrebista">
+          <div class="visual-toolbar">
+            <strong>Runge funtzioa, 11 nodo</strong>
+            <div class="legend">
+              <span><i class="dot" style="background:#17202a"></i>Erreala</span>
+              <span><i class="dot" style="background:#1e5eff"></i>Newton</span>
+              <span><i class="dot" style="background:#c0392b"></i>Nodoak</span>
+            </div>
+          </div>
+          <canvas id="heroChart" width="720" height="420"></canvas>
+        </figure>
+      </div>
+    </div>
+
+    <main>
+      <section class="support-strip" aria-label="Babestu doako gida hau">
+        <div>
+          <strong>Doako interpolazio gida.</strong>
+          Gida honek denbora aurrezten badizu, tutorial, adibide eta kode ireki
+          gehiago babes ditzakezu.
+        </div>
+        <div class="coffee-button">
+          <a class="coffee-cta" href="https://www.buymeacoffee.com/jramosg">
+            Erosi niri kafe bat
+          </a>
+        </div>
+      </section>
+
+      <section id="methods" aria-labelledby="what">
+        <h2 id="what">Zer ikasiko duzun</h2>
+        <p class="section-lead">
+          Orri hau Python-en datu puntuak interpolatzen ulertu nahi duen
+          edonorentzat dago idatzia, ez bakarrik formula bat kopiatzeko.
+        </p>
+        <div class="grid">
+          <article class="card">
+            <h3>Newton interpolazioa</h3>
+            <p>
+              Eraiki diferentzia banatuen taula eta ebaluatu Newton-en polinomioa
+              biderketa habiaratuekin modu eraginkorrean.
+            </p>
+            <strong>Funtsezko ideia: diferentzia banatuak</strong>
+          </article>
+          <article class="card">
+            <h3>Lagrange interpolazioa</h3>
+            <p>
+              Ulertu polinomio interpolatzailearen formula zuzena eta nola sortu
+              SciPy-rekin adibideetarako.
+            </p>
+            <strong>Funtsezko ideia: oinarri polinomikoak</strong>
+          </article>
+          <article class="card">
+            <h3>Chebyshev nodoak</h3>
+            <p>
+              Konparatu nodo ekiespaziatuak Chebyshev nodoekin eta ikusi
+              zergatik den garrantzitsua nodoen aukeraketa Runge fenomenorako.
+            </p>
+            <strong>Funtsezko ideia: nodoen kokapen hobea</strong>
+          </article>
+          <article class="card">
+            <h3>Interpolazio barizentrikoa</h3>
+            <p>
+              Konparatu SciPy-k erabiltzen duen interpolazio polinomiko
+              numerikoki egonkorra ebaluazio praktikorako.
+            </p>
+            <strong>Funtsezko ideia: ebaluazio polinomiko egonkorra</strong>
+          </article>
+          <article class="card">
+            <h3>Spline kubikoak</h3>
+            <p>
+              Ikusi zergatik saihesten dituzten zatika kubikoak diren
+              interpolazioek polinomio gradu altuko oszilazio asko.
+            </p>
+            <strong>Funtsezko ideia: zatikako interpolazio leuna</strong>
+          </article>
+        </div>
+      </section>
+
+      <section id="nodes" aria-labelledby="nodes-title">
+        <h2 id="nodes-title">Chebyshev nodoak vs nodo ekiespaziatuak</h2>
+        <p class="section-lead">
+          Nodoen kokapenak interpolazio formulak adina garrantzia izan dezake.
+          Gradu altuko interpolazio polinomikoan, berdin banatutako puntuek
+          tarte ertzetan oszilazio handiak sor ditzakete. Chebyshev nodoak
+          muturretan biltzen dira eta jokabide hori murriztu ohi dute.
+        </p>
+        <div class="comparison-grid">
+          <article class="card">
+            <h3>Nodo ekiespaziatuak</h3>
+            <p>
+              Ulertzeko errazak eta ohikoak lehenengo adibideetan, baina muturreko
+              oszilazio handiak sor ditzakete Runge bezalako funtzioetan
+              polinomioaren gradua handitzean.
+            </p>
+            <pre><code>x_nodes = np.linspace(-1, 1, n)</code></pre>
+          </article>
+          <article class="card">
+            <h3>Chebyshev nodoak</h3>
+            <p>
+              Nodoak tartearen muturretatik gertu kontzentratzen dira. Normalean
+              errore profil askoz hobea ematen dute nodo ekiespaziatuek baino
+              interpolazio polinomiko globalean.
+            </p>
+            <pre><code>k = np.arange(1, n + 1)
+x_nodes = np.cos((2*k - 1) * np.pi / (2*n))</code></pre>
+          </article>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Nodo mota</th>
+              <th>Zer gertatu ohi den</th>
+              <th>Probatu demoan</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Ekiespaziatua</td>
+              <td>Banaketa sinplea, baina Runge oszilazioen aurrean ahulagoa.</td>
+              <td>Erabili Runge funtzioa 11 edo 21 nodorekin.</td>
+            </tr>
+            <tr>
+              <td>Chebyshev</td>
+              <td>Muturretako oszilazio txikiagoa adibide global askotan.</td>
+              <td>Aldatu nodo mota Chebyshev-era eta konparatu kurba.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="newton" aria-labelledby="newton-title">
+        <h2 id="newton-title">Newton interpolazioa Python-en</h2>
+        <p class="section-lead">
+          Newton interpolazioak polinomioa idazten du diferentzia banatuen
+          taulako koefizienteak erabiliz. Erabilgarria da, datu puntu berri
+          bat gehitzeak ez baitu polinomio osoa berreraikitzea eskatzen.
+        </p>
+        <div class="steps">
+          <article class="step">
+            <h3>Aukeratu interpolazio nodoak</h3>
+            <p>
+              Hasi <code>(x0, y0), (x1, y1), ...</code> datu puntuekin.
+              <code>x</code> balioek bakanak izan behar dute.
+            </p>
+          </article>
+          <article class="step">
+            <h3>Eraiki diferentzia banatuen taula</h3>
+            <p>
+              Lehen zutabea <code>y</code> da. Hurrengo zutabe bakoitzak
+              aurreko balioen diferentzia zatitzen du x-nodoen arteko distantziaz.
+            </p>
+          </article>
+          <article class="step">
+            <h3>Ebaluatu Newton-en polinomioa</h3>
+            <p>
+              Erabili biderketa habiaratua polinomioaren ebaluazio
+              egonkor eta trinkorako.
+            </p>
+          </article>
+        </div>
+        <pre><code>import numpy as np
+from polynomial_interpolation import (
+    evaluate_newton_polynomial,
+    newton_coefficients,
+)
+
+x_nodes = np.array([-1.0, -0.5, 0.0, 0.5, 1.0])
+y_nodes = 1 / (1 + 25 * x_nodes**2)
+
+coefficients = newton_coefficients(x_nodes, y_nodes)
+value = evaluate_newton_polynomial(coefficients, x_nodes, 0.25)
+
+print(float(value))</code></pre>
+      </section>
+
+      <section id="lagrange" aria-labelledby="lagrange-title">
+        <h2 id="lagrange-title">Lagrange interpolazioa Python-en</h2>
+        <p class="section-lead">
+          Nodo berdinak erabiltzean, Lagrange interpolazioak Newton-ek bezalako
+          polinomio bera eraikitzen du. Formula zuzena eta erraz irakurtzekoa
+          denez, ohikoa da metodo numerikoen ikastaroetan.
+        </p>
+        <pre><code>import numpy as np
+from scipy.interpolate import lagrange
+
+x_nodes = np.array([-1.0, -0.5, 0.0, 0.5, 1.0])
+y_nodes = 1 / (1 + 25 * x_nodes**2)
+
+polynomial = lagrange(x_nodes, y_nodes)
+print(polynomial(0.25))</code></pre>
+        <table>
+          <thead>
+            <tr>
+              <th>Metodoa</th>
+              <th>Onena ikasteko</th>
+              <th>Ohar praktikoa</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Newton</td>
+              <td>Diferentzia banatuak, interpolazio inkrementala</td>
+              <td>Metodo egokia hutsetik inplementatzeko.</td>
+            </tr>
+            <tr>
+              <td>Lagrange</td>
+              <td>Polinomio interpolatzailearen formula ulertzea</td>
+              <td>Argia matematikoki, baina eguneratzeko ez hain eraginkorra.</td>
+            </tr>
+            <tr>
+              <td>Barizentrikoa</td>
+              <td>Interpolazio polinomiko egonkorra</td>
+              <td>Normalean hobetsia ebaluazio polinomiko numerikorako.</td>
+            </tr>
+            <tr>
+              <td>Spline kubikoa</td>
+              <td>Interpolazio leuna gradu altuko oszilaziorik gabe</td>
+              <td>Sarritan sendoagoa benetako datuetarako.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="demo" aria-labelledby="demo-title">
+        <h2 id="demo-title">Interpolazio demo interaktiboa</h2>
+        <p class="section-lead">
+          Aldatu funtzioa, nodoak eta ebaluazio puntua. Grafikak erakusten du
+          zergatik ematen duten Newton-ek eta Lagrange-k polinomio bera nodo
+          berdinekin, eta zergatik murrizten duten Chebyshev nodoek oszilazioa.
+        </p>
+        <div class="demo">
+          <aside class="controls" aria-label="Interpolazio kontrolak">
+            <div class="field">
+              <label for="functionSelect">Funtzioa</label>
+              <select id="functionSelect">
+                <option value="runge">Runge: 1 / (1 + 25x²)</option>
+                <option value="sin">sin(x)</option>
+                <option value="gaussian">exp(-20x²)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="nodeSelect">Nodo mota</label>
+              <select id="nodeSelect">
+                <option value="equispaced">Nodo ekiespaziatuak</option>
+                <option value="chebyshev">Chebyshev nodoak</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="countInput">Nodo kopurua</label>
+              <input id="countInput" type="number" min="3" max="25" value="11">
+            </div>
+            <div class="field">
+              <label for="pointInput">Ebaluatu x-n</label>
+              <input
+                id="pointInput"
+                type="number"
+                min="-1"
+                max="1"
+                step="0.05"
+                value="0.25"
+              >
+            </div>
+            <div class="result" id="demoResult">P(0.25) = ...</div>
+          </aside>
+          <figure class="wide-visual">
+            <div class="visual-toolbar">
+              <strong>Polinomio interpolatzailearen grafika</strong>
+              <div class="legend">
+                <span><i class="dot" style="background:#17202a"></i>Erreala</span>
+                <span><i class="dot" style="background:#1e5eff"></i>Newton</span>
+                <span><i class="dot" style="background:#c0392b"></i>Nodoak</span>
+              </div>
+            </div>
+            <canvas id="demoChart" width="860" height="430"></canvas>
+          </figure>
+        </div>
+      </section>
+
+      <section aria-labelledby="uso-title">
+        <h2 id="uso-title">Nola exekutatu biltegia</h2>
+        <p class="section-lead">
+          Fitxategi nagusiak esperimentu osoa berregiten du: Newton, Lagrange,
+          metodo barizentrikoa eta spline kubikoa.
+        </p>
+        <pre><code>python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python polynomial_interpolation.py</code></pre>
+      </section>
+
+      <section id="support" class="support-panel" aria-labelledby="support-title">
+        <div>
+          <p class="eyebrow">Babestu proiektua</p>
+          <h2 id="support-title">Lagundu gida hau doan mantentzen</h2>
+          <p class="section-lead">
+            Kode, grafika eta azalpenekin erreferentzia argia behar dutenentzat
+            sortu nuen. Lagungarria izan bazaizu, kafe batek metodo numerikoen
+            inguruko material gehiago argitaratzen laguntzen dit.
+          </p>
+        </div>
+        <div class="coffee-button">
+          <a class="coffee-cta" href="https://www.buymeacoffee.com/jramosg">
+            Erosi niri kafe bat
+          </a>
+          <p>
+            <a href="https://www.buymeacoffee.com/jramosg">
+              Ireki Buy Me a Coffee
+            </a>
+          </p>
+        </div>
+      </section>
+
+      <footer>
+        <p>
+          Iturburu kodea:
+          <a href="polynomial_interpolation.py">polynomial_interpolation.py</a>.
+          Beste hizkuntzak:
+          <a href="index.html" lang="en">English</a> ·
+          <a href="index-es.html" lang="es">Español</a>.
+        </p>
+      </footer>
+    </main>
+
+    <script src="app.js" defer></script>
+    <script
+      data-name="BMC-Widget"
+      data-cfasync="false"
+      src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js"
+      data-id="jramosg"
+      data-description="Support me on Buy Me a Coffee!"
+      data-message=""
+      data-color="#FFDD00"
+      data-position="Right"
+      data-x_margin="18"
+      data-y_margin="18"
+    ></script>
+  </body>
+</html>

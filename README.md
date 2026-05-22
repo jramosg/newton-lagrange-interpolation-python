@@ -5,7 +5,7 @@ step-by-step examples.
 
 - English: <https://jonramos.dev/newton-lagrange-interpolation-python/index.html>
 - Spanish: <https://jonramos.dev/newton-lagrange-interpolation-python/index-es.html>
-
+- Euskera: <https://jonramos.dev/newton-lagrange-interpolation-python/index-eu.html>
 # Método de interpolación de Newton en Python
 
 > Newton interpolation, divided differences, Chebyshev nodes, Runge phenomenon,
