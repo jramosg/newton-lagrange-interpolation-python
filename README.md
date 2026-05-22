@@ -3,7 +3,7 @@ step-by-step examples.
 
 ## Live Pages
 
-- English: <https://jonramos.dev/newton-lagrange-interpolation-python/index.html>
+- English: <https://jonramos.dev/newton-lagrange-interpolation-python/>
 - Spanish: <https://jonramos.dev/newton-lagrange-interpolation-python/index-es.html>
 - Euskera: <https://jonramos.dev/newton-lagrange-interpolation-python/index-eu.html>
 # Método de interpolación de Newton en Python
