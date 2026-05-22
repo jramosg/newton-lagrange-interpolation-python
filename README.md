@@ -29,7 +29,7 @@ comparativo con interpolacion baricentrica, Lagrange, Newton y splines cubicos.
 ```shell
 python -m venv .venv
 source .venv/bin/activate
-pip install numpy scipy matplotlib
+pip install -r requirements.txt
 ```
 
 SciPy se usa para los metodos baricentrico, Lagrange y spline cubico. Si no
@@ -40,32 +40,32 @@ esta instalado, el script sigue funcionando con el metodo de Newton.
 Ejecutar el experimento completo del notebook:
 
 ```shell
-python newton_interpolation.py
+python polynomial_interpolation.py
 ```
 
 Guardar resultados en CSV:
 
 ```shell
-python newton_interpolation.py --csv results/interpolation_results.csv
+python polynomial_interpolation.py --csv results/interpolation_results.csv
 ```
 
 Guardar graficas como imagenes PNG:
 
 ```shell
-python newton_interpolation.py --save-plots figures
+python polynomial_interpolation.py --save-plots figures
 ```
 
 Cambiar el numero de nodos o repeticiones para tiempos:
 
 ```shell
-python newton_interpolation.py --nodes 11 21 41 --repetitions 50
+python polynomial_interpolation.py --nodes 11 21 41 --repetitions 50
 ```
 
 ## Usar Newton desde otro archivo
 
 ```python
 import numpy as np
-from newton_interpolation import (
+from polynomial_interpolation import (
     evaluate_newton_polynomial,
     newton_coefficients,
 )
@@ -151,20 +151,20 @@ interpolation, SciPy Lagrange interpolation and cubic spline interpolation.
 ```shell
 python -m venv .venv
 source .venv/bin/activate
-pip install numpy scipy matplotlib
-python newton_interpolation.py
+pip install -r requirements.txt
+python polynomial_interpolation.py
 ```
 
 Save the benchmark table:
 
 ```shell
-python newton_interpolation.py --csv results/interpolation_results.csv
+python polynomial_interpolation.py --csv results/interpolation_results.csv
 ```
 
 Save plots:
 
 ```shell
-python newton_interpolation.py --save-plots figures
+python polynomial_interpolation.py --save-plots figures
 ```
 
 ## Why This Repository Is Useful
@@ -182,8 +182,11 @@ This project is designed as a clear student reference for:
 ## File Structure
 
 ```text
-newton_interpolation.py  # implementation, CLI experiment and plotting
-README.md                # Spanish and English documentation
+index.html                  # SEO static tutorial page for VPS deployment
+polynomial_interpolation.py # implementation, CLI experiment and plotting
+requirements.txt           # Python dependencies
+robots.txt                 # crawler access for static deployment
+README.md                  # Spanish and English documentation
 ```
 
 ## References
