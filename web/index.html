@@ -86,6 +86,7 @@
         <div>
           <a href="#methods">Methods</a>
           <a href="#nodes">Nodes</a>
+          <a href="#implementation">Code</a>
           <a href="#demo">Interactive demo</a>
           <a href="#support">Support</a>
           <a href="index-es.html" lang="es">Español</a>
@@ -343,6 +344,79 @@ print(polynomial(0.25))</code></pre>
             </tr>
           </tbody>
         </table>
+      </section>
+
+      <section id="implementation" aria-labelledby="implementation-title">
+        <h2 id="implementation-title">Inside the Python implementation</h2>
+        <p class="section-lead">
+          The repository keeps the Newton method as small, readable NumPy
+          functions. Here are the core pieces, straight from
+          <a href="polynomial_interpolation.py">polynomial_interpolation.py</a>.
+        </p>
+
+        <h3>Building the divided-difference table</h3>
+        <p>
+          The table starts with the <code>y</code> values in the first column.
+          Each next column divides the difference of the previous column by the
+          distance between the matching x-nodes. The Newton coefficients are
+          simply the top row of the finished table.
+        </p>
+        <pre><code>def divided_difference_table(x, y):
+    n = len(x)
+    table = np.zeros((n, n))
+    table[:, 0] = y
+
+    for order in range(1, n):
+        for row in range(n - order):
+            numerator = table[row + 1, order - 1] - table[row, order - 1]
+            denominator = x[row + order] - x[row]
+            table[row, order] = numerator / denominator
+
+    return table
+
+# Newton coefficients are the top row of the table:
+coefficients = divided_difference_table(x, y)[0, :]</code></pre>
+
+        <h3>Evaluating with nested multiplication (Horner's scheme)</h3>
+        <p>
+          Instead of expanding the polynomial, the evaluator walks the
+          coefficients backwards and multiplies as it goes. This is numerically
+          stable, works on a single point or a whole NumPy array, and keeps the
+          cost linear in the number of nodes.
+        </p>
+        <pre><code>def evaluate_newton_polynomial(coefficients, x_nodes, x_eval):
+    result = np.full_like(x_eval, coefficients[-1], dtype=float)
+
+    for i in range(len(coefficients) - 2, -1, -1):
+        result = result * (x_eval - x_nodes[i]) + coefficients[i]
+
+    return result</code></pre>
+
+        <h3>Comparing four methods on the same nodes</h3>
+        <p>
+          The benchmark builds the Newton polynomial from this repository and
+          the Lagrange, barycentric and cubic-spline interpolants from SciPy,
+          then measures the maximum and L2 error against the true function on a
+          dense grid.
+        </p>
+        <pre><code>from scipy.interpolate import (
+    BarycentricInterpolator,
+    InterpolatedUnivariateSpline,
+    lagrange,
+)
+
+# Newton (implemented in this repository)
+coefficients = newton_coefficients(x_nodes, y_nodes)
+y_newton = evaluate_newton_polynomial(coefficients, x_nodes, x_grid)
+
+# Lagrange, barycentric and cubic spline (SciPy)
+y_lagrange = lagrange(x_nodes, y_nodes)(x_grid)
+y_bary = BarycentricInterpolator(x_nodes, y_nodes)(x_grid)
+y_spline = InterpolatedUnivariateSpline(x_nodes, y_nodes, k=3)(x_grid)
+
+# Error against the true function on a dense grid
+max_error = np.max(np.abs(y_newton - y_true))
+l2_error = np.sqrt(np.trapezoid((y_newton - y_true)**2, x_grid))</code></pre>
       </section>
 
       <section id="demo" aria-labelledby="demo-title">

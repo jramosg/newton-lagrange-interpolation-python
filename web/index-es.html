@@ -87,6 +87,7 @@
         <div>
           <a href="#methods">Métodos</a>
           <a href="#nodes">Nodos</a>
+          <a href="#implementation">Código</a>
           <a href="#demo">Demo interactiva</a>
           <a href="#support">Apoyar</a>
           <a href="index.html" lang="en">English</a>
@@ -345,6 +346,80 @@ print(polynomial(0.25))</code></pre>
             </tr>
           </tbody>
         </table>
+      </section>
+
+      <section id="implementation" aria-labelledby="implementation-title">
+        <h2 id="implementation-title">Por dentro de la implementación en Python</h2>
+        <p class="section-lead">
+          El repositorio mantiene el método de Newton como funciones de NumPy
+          pequeñas y legibles. Estas son las piezas principales, tomadas
+          directamente de
+          <a href="polynomial_interpolation.py">polynomial_interpolation.py</a>.
+        </p>
+
+        <h3>Construir la tabla de diferencias divididas</h3>
+        <p>
+          La tabla empieza con los valores <code>y</code> en la primera columna.
+          Cada columna siguiente divide la diferencia de la columna anterior
+          entre la distancia entre los x-nodos correspondientes. Los coeficientes
+          de Newton son simplemente la primera fila de la tabla terminada.
+        </p>
+        <pre><code>def divided_difference_table(x, y):
+    n = len(x)
+    table = np.zeros((n, n))
+    table[:, 0] = y
+
+    for order in range(1, n):
+        for row in range(n - order):
+            numerator = table[row + 1, order - 1] - table[row, order - 1]
+            denominator = x[row + order] - x[row]
+            table[row, order] = numerator / denominator
+
+    return table
+
+# Los coeficientes de Newton son la primera fila de la tabla:
+coefficients = divided_difference_table(x, y)[0, :]</code></pre>
+
+        <h3>Evaluar con multiplicación anidada (esquema de Horner)</h3>
+        <p>
+          En lugar de expandir el polinomio, el evaluador recorre los
+          coeficientes hacia atrás y multiplica sobre la marcha. Es numéricamente
+          estable, funciona sobre un único punto o sobre un array completo de
+          NumPy, y mantiene el coste lineal en el número de nodos.
+        </p>
+        <pre><code>def evaluate_newton_polynomial(coefficients, x_nodes, x_eval):
+    result = np.full_like(x_eval, coefficients[-1], dtype=float)
+
+    for i in range(len(coefficients) - 2, -1, -1):
+        result = result * (x_eval - x_nodes[i]) + coefficients[i]
+
+    return result</code></pre>
+
+        <h3>Comparar cuatro métodos con los mismos nodos</h3>
+        <p>
+          El experimento construye el polinomio de Newton de este repositorio y
+          los interpoladores de Lagrange, baricéntrico y spline cúbico de SciPy,
+          y luego mide el error máximo y L2 frente a la función real en una malla
+          densa.
+        </p>
+        <pre><code>from scipy.interpolate import (
+    BarycentricInterpolator,
+    InterpolatedUnivariateSpline,
+    lagrange,
+)
+
+# Newton (implementado en este repositorio)
+coefficients = newton_coefficients(x_nodes, y_nodes)
+y_newton = evaluate_newton_polynomial(coefficients, x_nodes, x_grid)
+
+# Lagrange, baricéntrico y spline cúbico (SciPy)
+y_lagrange = lagrange(x_nodes, y_nodes)(x_grid)
+y_bary = BarycentricInterpolator(x_nodes, y_nodes)(x_grid)
+y_spline = InterpolatedUnivariateSpline(x_nodes, y_nodes, k=3)(x_grid)
+
+# Error frente a la función real en una malla densa
+max_error = np.max(np.abs(y_newton - y_true))
+l2_error = np.sqrt(np.trapezoid((y_newton - y_true)**2, x_grid))</code></pre>
       </section>
 
       <section id="demo" aria-labelledby="demo-title">
